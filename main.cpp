@@ -157,7 +157,7 @@ int main(int argc, char *argv[])
   }
 
 
-  bool dump_matrix = false;
+  bool dump_matrix = true;
   if (dump_matrix && size<=4) dump_matlab_matrix(A, rank);
 
 #ifdef USING_MPI
