@@ -110,6 +110,7 @@ int HPCCG(HPC_Sparse_Matrix * A,
 #endif
   TICK(); HPC_sparsemv(A, p, Ap); TOCK(t3);
   TICK(); waxpby(nrow, 1.0, b, -1.0, Ap, r); TOCK(t2);
+  //for(int i=0; i<nrow; i++) cout << b[i] << ' '; 
   TICK(); ddot(nrow, r, r, &rtrans, t4); TOCK(t1);
   normr = sqrt(rtrans);
 
@@ -126,6 +127,7 @@ int HPCCG(HPC_Sparse_Matrix * A,
 	  oldrtrans = rtrans;
 	  TICK(); ddot (nrow, r, r, &rtrans, t4); TOCK(t1);// 2*nrow ops
 	  double beta = rtrans/oldrtrans;
+    //cout << "beta: " << beta << endl; 
 	  TICK(); waxpby (nrow, 1.0, r, beta, p, p);  TOCK(t2);// 2*nrow ops
 	}
       normr = sqrt(rtrans);
@@ -137,11 +139,32 @@ int HPCCG(HPC_Sparse_Matrix * A,
       TICK(); exchange_externals(A,p); TOCK(t5); 
 #endif
       TICK(); HPC_sparsemv(A, p, Ap); TOCK(t3); // 2*nnz ops
+      //cout << endl; 
       double alpha = 0.0;
       TICK(); ddot(nrow, p, Ap, &alpha, t4); TOCK(t1); // 2*nrow ops
       alpha = rtrans/alpha;
+      /*
+      cout << "alpha: " << alpha << endl; 
+      cout << "rtrans: " << rtrans << endl; 
+      cout << "p: "; 
+      for(int i=0; i<nrow; i++) cout << p[i] << " ";
+      cout << endl; 
+      cout << "Ap: "; 
+      for(int i=0; i<nrow; i++) cout << Ap[i] << " ";
+      cout << endl; 
+      */
       TICK(); waxpby(nrow, 1.0, x, alpha, p, x);// 2*nrow ops
+      /*
+      cout << "x: "; 
+      for(int i=0; i<nrow; i++) cout << x[i] << " ";
+      cout << endl; 
+      */
       waxpby(nrow, 1.0, r, -alpha, Ap, r);  TOCK(t2);// 2*nrow ops
+      /*
+      cout << "r: "; 
+      for(int i=0; i<nrow; i++) cout << r[i] << " ";
+      cout << endl; 
+      */
       niters = k;
     }
 
